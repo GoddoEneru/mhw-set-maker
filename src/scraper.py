@@ -15,6 +15,7 @@ class Scraper:
             leg_armors_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500642",
             armors_by_monster_low_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500342",
             armors_by_monster_high_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500343",
+            armors_csv="src/data/armors.csv"
             ):
         self.decoration_url = decoration_url
         self.decoration_csv = decoration_csv
@@ -25,6 +26,7 @@ class Scraper:
         self.leg_armors_url = leg_armors_url
         self.armors_by_monster_low_url = armors_by_monster_low_url
         self.armors_by_monster_high_url = armors_by_monster_high_url
+        self.armors_csv = armors_csv
 
     def get_table_from_url(self, url, text):
         page = requests.get(url)
@@ -47,6 +49,17 @@ class Scraper:
         df = pd.concat([df, temp], axis=1)
         df.rename(columns={0: f"Skill_{n}_lvl"}, inplace=True)
         return df
+
+    def slot_size_char_to_int(self, c):
+        match c:
+            case "ー":
+                return None
+            case "①":
+                return 1
+            case "②":
+                return 2
+            case "③":
+                return 3
 
     def decorations_scraping(self):
         table = self.get_table_from_url(self.decoration_url, "Slots")
@@ -108,7 +121,7 @@ class Scraper:
             'Skills',
             'Skill 1',
             'Skill 2',
-            'Skill 3'
+            'Skill 3',
             ], inplace=True)
 
         # get decorations slots from armors by monster
@@ -136,8 +149,20 @@ class Scraper:
 
         df_decorations_slots = df_decorations_slots[~df_decorations_slots["Armor"].isna()]
 
-        return df_decorations_slots, df_armors
+        df_slots_size = pd.DataFrame([list(x) for x in df_decorations_slots['Slots']], index=df_decorations_slots.index)
+        slots_size_col_names = ["Decoration_slot_1_size", "Decoration_slot_2_size", "Decoration_slot_3_size"]
+        df_slots_size.columns = slots_size_col_names
 
-        # TODO: add decorations slots data to df_armors and save df_armors
+        df_decorations_slots = pd.concat([df_decorations_slots, df_slots_size], axis=1)
 
-        return df_armors
+        for col in slots_size_col_names:
+            df_decorations_slots[col] = df_decorations_slots[col].apply(lambda x: self.slot_size_char_to_int(x))
+
+        df_armors = df_armors.merge(df_decorations_slots, how='inner', on='Armor')
+        df_armors.drop(columns=[
+            'Slots',
+            'Skills'
+            ], inplace=True)
+
+        df_armors.to_csv(self.armors_csv, index=False)
+        print("Armors data scraping done !")
