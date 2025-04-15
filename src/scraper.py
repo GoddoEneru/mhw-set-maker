@@ -61,6 +61,11 @@ class Scraper:
             case "③":
                 return 3
 
+    def correct_error_in_skill_col(self, skill):
+        if skill[-1].isnumeric():
+            return skill
+        return skill + "1"
+
     def decorations_scraping(self):
         table = self.get_table_from_url(self.decoration_url, "Slots")
         columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
@@ -116,6 +121,9 @@ class Scraper:
 
         df_armors = self.get_one_col_per_skill(df_armors, 'Skills', r'(\D+\d*)')
         for n in range(1, 4):
+            df_armors[f'Skill {n}'] = df_armors[f'Skill {n}'].apply(
+                lambda x: x if pd.isnull(x) else self.correct_error_in_skill_col(x)
+                )
             df_armors[f"Skill_{n}_name"] = df_armors[f'Skill {n}'].str[:-1]
             df_armors = self.get_skill_lvl_from_skill_columns(df_armors, n)
 
@@ -135,8 +143,8 @@ class Scraper:
         armors_decorations_slots_links = []
         for armors_by_monster_url in [self.armors_by_monster_low_url, self.armors_by_monster_high_url]:
             table = self.get_table_from_url(armors_by_monster_url, "Skills")
-            temp = [tr.find("a") for tr in table.find("tbody").find_all("tr")]
-            armors_decorations_slots_links += [a.get('href') for a in temp]
+            anchors = [tr.find("a") for tr in table.find("tbody").find_all("tr")]
+            armors_decorations_slots_links += [a.get('href') for a in anchors]
 
         for link in armors_decorations_slots_links:
             try:
