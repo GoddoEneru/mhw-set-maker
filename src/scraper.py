@@ -28,7 +28,7 @@ class Scraper:
         self.armors_by_monster_high_url = armors_by_monster_high_url
         self.armors_csv = armors_csv
 
-    def get_table_from_url(self, url, text):
+    def _get_table_from_url(self, url, text):
         page = requests.get(url)
         soup = BeautifulSoup(page.text, "html.parser")
         tables = soup.find_all('table')
@@ -36,21 +36,21 @@ class Scraper:
             if len(table.find_all('th', text=text)) >= 1:
                 return table
 
-    def get_one_col_per_skill(self, df, skills_col_name, reg_rule):
+    def _get_one_col_per_skill(self, df, skills_col_name, reg_rule):
         temp = df[skills_col_name].str.extractall(reg_rule).unstack()
         temp.columns = temp.columns.droplevel()
         df = pd.concat([df, temp], axis=1)
         df.rename(columns={i: f'Skill {i+1}' for i in temp.columns}, inplace=True)
         return df
 
-    def get_skill_lvl_from_skill_columns(self, df, n):
+    def _get_skill_lvl_from_skill_columns(self, df, n):
         temp = df[f'Skill {n}'].str.extractall(r'(\d)').unstack()
         temp.columns = temp.columns.droplevel()
         df = pd.concat([df, temp], axis=1)
         df.rename(columns={0: f"Skill_{n}_lvl"}, inplace=True)
         return df
 
-    def slot_size_char_to_int(self, c):
+    def _slot_size_char_to_int(self, c):
         match c:
             case "ー":
                 return None
@@ -61,13 +61,13 @@ class Scraper:
             case "③":
                 return 3
 
-    def correct_error_in_skill_col(self, skill):
+    def _correct_error_in_skill_col(self, skill):
         if skill[-1].isnumeric():
             return skill
         return skill + "1"
 
     def decorations_scraping(self):
-        table = self.get_table_from_url(self.decoration_url, "Slots")
+        table = self._get_table_from_url(self.decoration_url, "Slots")
         columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
         data = []
 
@@ -75,11 +75,11 @@ class Scraper:
             data.append([td.get_text(strip=True) for td in tr.find_all("td")])
         df_decorations = pd.DataFrame(data, columns=columns)
 
-        df_decorations = self.get_one_col_per_skill(df_decorations, 'Skill', r'(\D+Lv. \d)')
+        df_decorations = self._get_one_col_per_skill(df_decorations, 'Skill', r'(\D+Lv. \d)')
         for n in range(1, 2):
             temp = df_decorations[f'Skill {n}'].str.split(r'(Lv. \d)').str[0]
             df_decorations[f"Skill_{n}_name"] = temp
-            df_decorations = self.get_skill_lvl_from_skill_columns(df_decorations, n)
+            df_decorations = self._get_skill_lvl_from_skill_columns(df_decorations, n)
 
         df_decorations.drop(columns=[
             'Skill',
@@ -103,7 +103,7 @@ class Scraper:
         armor_types = ["head", "chest", "arm", "waist", "leg"]
 
         for i, url in enumerate(armors_by_type_urls):
-            table = self.get_table_from_url(url, "Armor")
+            table = self._get_table_from_url(url, "Armor")
             columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
             columns.append("Armor_type")
             data = []
@@ -119,13 +119,13 @@ class Scraper:
         df_armors.rename(columns={"": "Defense"}, inplace=True)
         df_armors["Defense"] = df_armors["Defense"].str.findall(r'\d').str.join("")
 
-        df_armors = self.get_one_col_per_skill(df_armors, 'Skills', r'(\D+\d*)')
+        df_armors = self._get_one_col_per_skill(df_armors, 'Skills', r'(\D+\d*)')
         for n in range(1, 4):
             df_armors[f'Skill {n}'] = df_armors[f'Skill {n}'].apply(
-                lambda x: x if pd.isnull(x) else self.correct_error_in_skill_col(x)
+                lambda x: x if pd.isnull(x) else self._correct_error_in_skill_col(x)
                 )
             df_armors[f"Skill_{n}_name"] = df_armors[f'Skill {n}'].str[:-1]
-            df_armors = self.get_skill_lvl_from_skill_columns(df_armors, n)
+            df_armors = self._get_skill_lvl_from_skill_columns(df_armors, n)
 
         df_armors.drop(columns=[
             'Type 1',
@@ -142,13 +142,13 @@ class Scraper:
 
         armors_decorations_slots_links = []
         for armors_by_monster_url in [self.armors_by_monster_low_url, self.armors_by_monster_high_url]:
-            table = self.get_table_from_url(armors_by_monster_url, "Skills")
+            table = self._get_table_from_url(armors_by_monster_url, "Skills")
             anchors = [tr.find("a") for tr in table.find("tbody").find_all("tr")]
             armors_decorations_slots_links += [a.get('href') for a in anchors]
 
         for link in armors_decorations_slots_links:
             try:
-                table = self.get_table_from_url(link, "Slots")
+                table = self._get_table_from_url(link, "Slots")
                 columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
                 data = []
 
@@ -169,7 +169,7 @@ class Scraper:
         df_decorations_slots = pd.concat([df_decorations_slots, df_slots_size], axis=1)
 
         for col in slots_size_col_names:
-            df_decorations_slots[col] = df_decorations_slots[col].apply(lambda x: self.slot_size_char_to_int(x))
+            df_decorations_slots[col] = df_decorations_slots[col].apply(lambda x: self._slot_size_char_to_int(x))
 
         df_armors = df_armors.merge(df_decorations_slots, how='inner', on='Armor')
         df_armors.drop(columns=[
