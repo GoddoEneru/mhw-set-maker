@@ -7,34 +7,32 @@ class Scraper:
     def __init__(
             self,
             decoration_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500473",
-            decoration_table_num=1,
             decoration_csv="src/data/decorations.csv",
             head_armors_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500636",
             chest_armors_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500639",
             arm_armors_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500640",
             waist_armors_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500641",
             leg_armors_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500642",
-            armors_by_type_num=1,
-            armors_by_monster_url="https://game8.co/games/Monster-Hunter-Wilds/archives/482808",
-            armors_by_monster_table_num=1,
+            armors_by_monster_low_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500342",
+            armors_by_monster_high_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500343",
             ):
         self.decoration_url = decoration_url
-        self.decoration_table_num = decoration_table_num
         self.decoration_csv = decoration_csv
         self.head_armors_url = head_armors_url
         self.chest_armors_url = chest_armors_url
         self.arm_armors_url = arm_armors_url
         self.waist_armors_url = waist_armors_url
         self.leg_armors_url = leg_armors_url
-        self.armors_by_type_num = armors_by_type_num
-        self.armors_by_monster_url = armors_by_monster_url
-        self.armors_by_monster_table_num = armors_by_monster_table_num
+        self.armors_by_monster_low_url = armors_by_monster_low_url
+        self.armors_by_monster_high_url = armors_by_monster_high_url
 
-    def get_tables_from_url(self, url):
+    def get_table_from_url(self, url, text):
         page = requests.get(url)
         soup = BeautifulSoup(page.text, "html.parser")
         tables = soup.find_all('table')
-        return tables
+        for table in tables:
+            if len(table.find_all('th', text=text)) >= 1:
+                return table
 
     def get_one_col_per_skill(self, df, skills_col_name, reg_rule):
         temp = df[skills_col_name].str.extractall(reg_rule).unstack()
@@ -51,11 +49,11 @@ class Scraper:
         return df
 
     def decorations_scraping(self):
-        tables = self.get_tables_from_url(self.decoration_url)
-        columns = [i.get_text(strip=True) for i in tables[self.decoration_table_num].find_all("th")]
+        table = self.get_table_from_url(self.decoration_url, "Slots")
+        columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
         data = []
 
-        for tr in tables[self.decoration_table_num].find("tbody").find_all("tr"):
+        for tr in table.find("tbody").find_all("tr"):
             data.append([td.get_text(strip=True) for td in tr.find_all("td")])
         df_decorations = pd.DataFrame(data, columns=columns)
 
@@ -85,11 +83,11 @@ class Scraper:
             ]
 
         for url in armors_by_type_urls:
-            tables = self.get_tables_from_url(url)
-            columns = [i.get_text(strip=True) for i in tables[self.armors_by_type_num].find_all("th")]
+            table = self.get_table_from_url(url, "Armor")
+            columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
             data = []
 
-            for tr in tables[self.armors_by_type_num].find("tbody").find_all("tr"):
+            for tr in table.find("tbody").find_all("tr"):
                 data.append([td.get_text(strip=True) for td in tr.find_all("td")])
             df_armors = pd.concat([df_armors, pd.DataFrame(data, columns=columns)])
 
@@ -114,15 +112,32 @@ class Scraper:
             ], inplace=True)
 
         # get decorations slots from armors by monster
-        tables = self.get_tables_from_url(self.armors_by_monster_url)
-        armors_decorations_slots_links = tables[self.armors_by_monster_table_num].find_all("a")
-        armors_decorations_slots_links = [a.get('href') for a in armors_decorations_slots_links]
+        df_decorations_slots = pd.DataFrame()
+
+        armors_decorations_slots_links = []
+        for armors_by_monster_url in [self.armors_by_monster_low_url, self.armors_by_monster_high_url]:
+            table = self.get_table_from_url(armors_by_monster_url, "Skills")
+            temp = [tr.find("a") for tr in table.find("tbody").find_all("tr")]
+            armors_decorations_slots_links += [a.get('href') for a in temp]
 
         for link in armors_decorations_slots_links:
-            tables = self.get_tables_from_url(link)
-            print(tables)
-            break
+            try:
+                table = self.get_table_from_url(link, "Slots")
+                columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
+                data = []
 
-        # TODO: concat decorations slots data from each monster's armor page
+                for tr in table.find_all("tr"):
+                    data.append([td.get_text(strip=True) for td in tr.find_all("td")])
+                df_decorations_slots = pd.concat([df_decorations_slots, pd.DataFrame(data, columns=columns)])
+            except Exception as e:
+                print(e)
+                print(link)
+                print("".join(['-' for i in range(50)]))
+
+        df_decorations_slots = df_decorations_slots[~df_decorations_slots["Armor"].isna()]
+
+        return df_decorations_slots, df_armors
 
         # TODO: add decorations slots data to df_armors and save df_armors
+
+        return df_armors
