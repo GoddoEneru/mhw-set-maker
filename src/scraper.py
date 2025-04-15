@@ -95,13 +95,18 @@ class Scraper:
             self.leg_armors_url
             ]
 
-        for url in armors_by_type_urls:
+        armor_types = ["head", "chest", "arm", "waist", "leg"]
+
+        for i, url in enumerate(armors_by_type_urls):
             table = self.get_table_from_url(url, "Armor")
             columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
+            columns.append("Armor_type")
             data = []
 
             for tr in table.find("tbody").find_all("tr"):
-                data.append([td.get_text(strip=True) for td in tr.find_all("td")])
+                row = [td.get_text(strip=True) for td in tr.find_all("td")]
+                row.append(armor_types[i])
+                data.append(row)
             df_armors = pd.concat([df_armors, pd.DataFrame(data, columns=columns)])
 
         df_armors.reset_index(drop=True, inplace=True)
