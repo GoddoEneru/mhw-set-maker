@@ -17,7 +17,9 @@ class Scraper:
             armors_by_monster_high_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500343",
             armors_csv="src/data/armors.csv",
             skills_info_url="https://game8.co/games/Monster-Hunter-Wilds/archives/482545",
-            skills_info_csv="src/data/skills.csv"
+            skills_info_csv="src/data/skills.csv",
+            talismans_url="https://game8.co/games/Monster-Hunter-Wilds/archives/497353",
+            talismans_csv="src/data/talismans.csv"
             ):
         self.decoration_url = decoration_url
         self.decoration_csv = decoration_csv
@@ -31,6 +33,8 @@ class Scraper:
         self.armors_csv = armors_csv
         self.skills_info_url = skills_info_url
         self.skills_info_csv = skills_info_csv
+        self.talismans_url = talismans_url
+        self.talismans_csv = talismans_csv
 
     def _get_table_from_url(self, url, text):
         page = requests.get(url)
@@ -184,7 +188,7 @@ class Scraper:
         df_armors.to_csv(self.armors_csv, index=False)
         print("Armors data scraping done !")
 
-    def scraping_skills_info(self):
+    def skills_info_scraping(self):
         table = self._get_table_from_url(self.skills_info_url, "Type")
         columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
         data = []
@@ -202,4 +206,20 @@ class Scraper:
         df_skills_info = df_skills_info[df_skills_info['Type'] == 'Armor'].reset_index(drop=True)
 
         df_skills_info.to_csv(self.skills_info_csv, index=False)
-        print("Armors data scraping done !")
+        print("Skills info data scraping done !")
+
+    def talismans_scraping(self):
+        table = self._get_table_from_url(self.talismans_url, "Talisman")
+        columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
+        data = []
+
+        for tr in table.find("tbody").find_all("tr"):
+            data.append([td.get_text(strip=True) for td in tr.find_all("td")])
+        df_talismans = pd.DataFrame(data, columns=columns)
+
+        df_talismans["Skill_name"] = df_talismans['Skill'].str.split(r'(Lv \d)').str[0]
+        df_talismans["Skill_lvl"] = df_talismans['Skill'].str.extract(r'(\d)')
+        df_talismans.drop(columns=['Skill'], inplace=True)
+
+        df_talismans.to_csv(self.talismans_csv, index=False)
+        print("talismans data scraping done !")

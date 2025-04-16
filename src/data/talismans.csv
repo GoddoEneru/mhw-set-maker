@@ -1,0 +1,164 @@
+Talisman,Rarity,Skill_name,Skill_lvl
+Blast Charm I,3,Blast Resistance,1
+Blast Charm II,4,Blast Resistance,2
+Blast Charm III,5,Blast Resistance,3
+Bleed Charm I,3,Bleeding Resistance,1
+Bleed Charm II,5,Bleeding Resistance,2
+Bleed Charm III,6,Bleeding Resistance,3
+Blessing Charm I,3,Divine Blessing,1
+Blessing Charm II,4,Divine Blessing,2
+Blessing Charm III,5,Divine Blessing,3
+Blight Charm I,6,Blight Resistance,1
+Blight Charm II,7,Blight Resistance,2
+Bombardier Charm I,4,Bombardier,1
+Bombardier Charm II,5,Bombardier,2
+Bombardier Charm III,6,Bombardier,3
+Botany Charm I,2,Botanist,1
+Botany Charm II,4,Botanist,2
+Botany Charm III,4,Botanist,3
+Botany Charm IV,5,Botanist,4
+Breaker Charm I,5,Partbreaker,1
+Breaker Charm II,7,Partbreaker,2
+Chain Charm I,5,Burst,1
+Chain Charm II,7,Burst,2
+Chainblade Charm I,4,Flayer,1
+Chainblade Charm II,7,Flayer,2
+Challenger Charm I,5,Agitator,1
+Challenger Charm II,7,Agitator,2
+Convert Charm I,7,Convert Element,1
+Convert Charm II,8,Convert Element,2
+Counter Charm I,5,Counterstrike,1
+Counter Charm II,6,Counterstrike,2
+Counter Charm III,7,Counterstrike,3
+Counterattack Charm I,5,Adrenaline Rush,1
+Counterattack Charm II,7,Adrenaline Rush,2
+Defense Charm I,2,Defense Boost,1
+Defense Charm II,4,Defense Boost,2
+Defense Charm III,5,Defense Boost,3
+Defense Charm IV,6,Defense Boost,4
+Descent Charm I,4,Ambush,1
+Descent Charm II,6,Ambush,2
+Dragon Charm I,3,Dragon Resistance,1
+Dragon Charm II,4,Dragon Resistance,2
+Dragon Charm III,5,Dragon Resistance,3
+Earplugs Charm I,6,Earplugs,1
+Earplugs Charm II,7,Earplugs,2
+Escape Charm I,4,Bind Resistance,1
+Escape Charm II,6,Bind Resistance,2
+Escape Charm III,7,Bind Resistance,3
+Evasion Charm I,4,Evade Window,1
+Evasion Charm II,5,Evade Window,2
+Evasion Charm III,6,Evade Window,3
+Evasion Charm IV,7,Evade Window,4
+Exploiter Charm I,5,Weakness Exploit,1
+Exploiter Charm II,7,Weakness Exploit,2
+Extension Charm I,3,Item Prolonger,1
+Extension Charm II,4,Item Prolonger,2
+Extension Charm III,5,Item Prolonger,3
+Fire Charm I,2,Fire Resistance,1
+Fire Charm II,4,Fire Resistance,2
+Fire Charm III,5,Fire Resistance,3
+Fitness Charm I,4,Constitution,1
+Fitness Charm II,5,Constitution,2
+Fitness Charm III,6,Constitution,3
+Fitness Charm IV,7,Constitution,4
+Fitness Charm V,8,Constitution,5
+Foray Charm I,4,Foray,1
+Foray Charm II,6,Foray,2
+Friendship Charm I,3,Wide-Range,1
+Friendship Charm II,4,Wide-Range,2
+Friendship Charm III,4,Wide-Range,3
+Friendship Charm IV,5,Wide-Range,4
+Fury Charm I,5,Resentment,1
+Fury Charm II,7,Resentment,2
+Geology Charm I,2,Geologist,1
+Geology Charm II,4,Geologist,2
+Geology Charm III,5,Geologist,3
+Glutton's Charm I,2,Speed Eating,1
+Glutton's Charm II,4,Speed Eating,2
+Glutton's Charm III,5,Speed Eating,3
+Grit Charm I,4,Heroics,1
+Grit Charm II,6,Heroics,2
+Grit Charm III,7,Heroics,3
+Guard Charm I,3,Iron Skin,1
+Guard Charm II,5,Iron Skin,2
+Guard Charm III,6,Iron Skin,3
+Hope Charm,5,Self-Improvement,1
+Hungerless Charm I,2,Hunger Resistance,1
+Hungerless Charm II,4,Hunger Resistance,2
+Hungerless Charm III,5,Hunger Resistance,3
+Ice Charm I,3,Ice Resistance,1
+Ice Charm II,4,Ice Resistance,2
+Ice Charm III,5,Ice Resistance,3
+Imbibe Charm I,7,Elemental Absorption,1
+Impact Charm I,3,Flinch Free,1
+Impact Charm II,4,Flinch Free,2
+Impact Charm III,5,Flinch Free,3
+Intimidator Charm I,3,Intimidator,1
+Intimidator Charm II,5,Intimidator,2
+Intimidator Charm III,6,Intimidator,3
+Leaping Charm I,4,Evade Extender,1
+Leaping Charm II,5,Evade Extender,2
+Leaping Charm III,6,Evade Extender,3
+Light Eater's Charm I,4,Free Meal,1
+Light Eater's Charm II,5,Free Meal,2
+Light Eater's Charm III,6,Free Meal,3
+Maintenance Charm I,4,Tool Specialist,1
+Maintenance Charm II,6,Tool Specialist,2
+Maintenance Charm III,7,Tool Specialist,3
+Marathon Charm I,4,Marathon Runner,1
+Marathon Charm II,5,Marathon Runner,2
+Marathon Charm III,6,Marathon Runner,3
+Mighty Charm I,5,Maximum Might,1
+Mighty Charm II,7,Maximum Might,2
+Mushroom Charm I,4,Mushroomancer,1
+Mushroom Charm II,6,Mushroomancer,2
+Mushroom Charm III,7,Mushroomancer,3
+Paralysis Charm I,2,Paralysis Resistance,1
+Paralysis Charm II,4,Paralysis Resistance,2
+Paralysis Charm III,5,Paralysis Resistance,3
+Phoenix Charm I,6,Coalescence,1
+Phoenix Charm II,7,Coalescence,2
+Poison Charm I,3,Poison Resistance,1
+Poison Charm II,4,Poison Resistance,2
+Poison Charm III,5,Poison Resistance,3
+Power Charm I,5,Latent Power,1
+Power Charm II,7,Latent Power,2
+Recovery Charm I,3,Recovery Up,1
+Recovery Charm II,4,Recovery Up,2
+Recovery Charm III,5,Recovery Up,3
+Sanity Charm I,5,Antivirus,1
+Sanity Charm II,6,Antivirus,2
+Sanity Charm III,7,Antivirus,3
+Sheathe Charm I,4,Quick Sheathe,1
+Sheathe Charm II,5,Quick Sheathe,2
+Sheathe Charm III,6,Quick Sheathe,3
+Sleep Charm I,3,Sleep Resistance,1
+Sleep Charm II,4,Sleep Resistance,2
+Sleep Charm III,5,Sleep Resistance,3
+Speed Heal Charm I,2,Recovery Speed,1
+Speed Heal Charm II,4,Recovery Speed,2
+Speed Heal Charm III,5,Recovery Speed,3
+Stun Charm I,3,Stun Resistance,1
+Stun Charm II,4,Stun Resistance,2
+Stun Charm III,5,Stun Resistance,3
+Surge Charm I,4,Stamina Surge,1
+Surge Charm II,5,Stamina Surge,2
+Surge Charm III,6,Stamina Surge,3
+Survival Charm I,3,Survival Expert,1
+Survival Charm II,5,Survival Expert,2
+Survival Charm III,6,Survival Expert,3
+Thunder Charm I,3,Thunder Resistance,1
+Thunder Charm II,4,Thunder Resistance,2
+Thunder Charm III,5,Thunder Resistance,3
+Tremor Charm I,4,Tremor Resistance,1
+Tremor Charm II,5,Tremor Resistance,2
+Tremor Charm III,6,Tremor Resistance,3
+Unscathed Charm I,5,Peak Performance,1
+Unscathed Charm II,7,Peak Performance,2
+Water Charm I,2,Water Resistance,1
+Water Charm II,4,Water Resistance,2
+Water Charm III,5,Water Resistance,3
+Windproof Charm I,4,Windproof,1
+Windproof Charm II,5,Windproof,2
+Windproof Charm III,6,Windproof,3
