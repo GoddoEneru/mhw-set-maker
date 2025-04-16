@@ -15,7 +15,9 @@ class Scraper:
             leg_armors_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500642",
             armors_by_monster_low_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500342",
             armors_by_monster_high_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500343",
-            armors_csv="src/data/armors.csv"
+            armors_csv="src/data/armors.csv",
+            skills_info_url="https://game8.co/games/Monster-Hunter-Wilds/archives/482545",
+            skills_info_csv="src/data/skills.csv"
             ):
         self.decoration_url = decoration_url
         self.decoration_csv = decoration_csv
@@ -27,6 +29,8 @@ class Scraper:
         self.armors_by_monster_low_url = armors_by_monster_low_url
         self.armors_by_monster_high_url = armors_by_monster_high_url
         self.armors_csv = armors_csv
+        self.skills_info_url = skills_info_url
+        self.skills_info_csv = skills_info_csv
 
     def _get_table_from_url(self, url, text):
         page = requests.get(url)
@@ -178,4 +182,24 @@ class Scraper:
             ], inplace=True)
 
         df_armors.to_csv(self.armors_csv, index=False)
+        print("Armors data scraping done !")
+
+    def scraping_skills_info(self):
+        table = self._get_table_from_url(self.skills_info_url, "Type")
+        columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
+        data = []
+
+        for tr in table.find("tbody").find_all("tr"):
+            data.append([td.get_text(strip=True) for td in tr.find_all("td")])
+        df_skills_info = pd.DataFrame(data, columns=columns)
+
+        temp = df_skills_info['Effect'].str.extractall(r'(Lv. \d)').unstack()
+        temp.columns = temp.columns.droplevel()
+        temp['final'] = temp.ffill(axis=1).iloc[:, -1]
+        temp['final'] = temp['final'].str.extract(r'(\d)')
+        df_skills_info['skill_max_level'] = temp['final']
+
+        df_skills_info = df_skills_info[df_skills_info['Type'] == 'Armor'].reset_index(drop=True)
+
+        df_skills_info.to_csv(self.skills_info_csv, index=False)
         print("Armors data scraping done !")
