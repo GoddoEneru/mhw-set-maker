@@ -94,6 +94,8 @@ class Scraper:
             'Skill 1',
             ], inplace=True)
 
+        df_decorations.rename(columns={"Decoration": "Decoration_name", "Slots": "Decoration_size"}, inplace=True)
+
         df_decorations.to_csv(self.decoration_csv, index=False)
         print("Decoration data scraping done !")
 
@@ -180,7 +182,12 @@ class Scraper:
             df_decorations_slots[col] = df_decorations_slots[col].apply(lambda x: self._slot_size_char_to_int(x))
 
         df_armors = df_armors.merge(df_decorations_slots, how='inner', on='Armor')
+
+        for k, v in {"α": "alpha", "β": "beta", "γ": "upsilon"}.items():
+            df_armors['Armor'] = df_armors['Armor'].str.replace(k, v)
+
         df_armors.drop(columns=[
+            'Set',
             'Slots',
             'Skills'
             ], inplace=True)
