@@ -36,6 +36,7 @@ Defense Charm I,2,Defense Boost,1
 Defense Charm II,4,Defense Boost,2
 Defense Charm III,5,Defense Boost,3
 Defense Charm IV,6,Defense Boost,4
+Defense Charm V,7,Defense Boost,5
 Descent Charm I,4,Ambush,1
 Descent Charm II,6,Ambush,2
 Dragon Charm I,3,Dragon Resistance,1
@@ -111,6 +112,7 @@ Marathon Charm II,5,Marathon Runner,2
 Marathon Charm III,6,Marathon Runner,3
 Mighty Charm I,5,Maximum Might,1
 Mighty Charm II,7,Maximum Might,2
+Mighty Charm III,8,Maximum Might,3
 Mushroom Charm I,4,Mushroomancer,1
 Mushroom Charm II,6,Mushroomancer,2
 Mushroom Charm III,7,Mushroomancer,3
@@ -124,9 +126,11 @@ Poison Charm II,4,Poison Resistance,2
 Poison Charm III,5,Poison Resistance,3
 Power Charm I,5,Latent Power,1
 Power Charm II,7,Latent Power,2
+Power Charm III,8,Latent Power,3
 Recovery Charm I,3,Recovery Up,1
 Recovery Charm II,4,Recovery Up,2
 Recovery Charm III,5,Recovery Up,3
+Rice Ball Charm,6,Rice Ball,1
 Sanity Charm I,5,Antivirus,1
 Sanity Charm II,6,Antivirus,2
 Sanity Charm III,7,Antivirus,3
