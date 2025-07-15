@@ -127,7 +127,7 @@ class Scraper:
         df_armors.reset_index(drop=True, inplace=True)
 
         df_armors.rename(columns={"": "Defense"}, inplace=True)
-        df_armors["Defense"] = df_armors["Defense"].str.findall(r'\d').str.join("")
+        df_armors["Defense"] = df_armors["Defense"].str.findall(r'\d+').str[0]
 
         df_armors = self._get_one_col_per_skill(df_armors, 'Skills', r'(\D+\d*)')
         for n in range(1, 4):
