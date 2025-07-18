@@ -80,7 +80,7 @@ class SetMaker:
             [pd.json_normalize(relevant_set.__dict__, sep='_') for relevant_set in all_relevant_sets])
         return all_relevant_sets
 
-    def get_best_set_from_all_relevant_set(self, all_relevant_sets, df_skills, necessary_skills):
+    def get_best_set(self, all_relevant_sets, df_skills, necessary_skills, sort_on='defense'):
         all_relevant_sets.reset_index(inplace=True, drop=True)
         all_relevant_sets = all_relevant_sets.fillna(0)
 
@@ -90,9 +90,15 @@ class SetMaker:
                        <= df_skills[df_skills['Skill'] == skill_name]['skill_max_level'].item())
         all_relevant_sets = all_relevant_sets.loc[filter].reset_index(drop=True)
 
-        sort_by = [f'skills_{skill_name}' for skill_name in necessary_skills]\
-            + ['defense', 'decorations_score', 'nb_decorations_size_1']
+        match sort_on:
+            case "defense":
+                sort_by = [f'skills_{skill_name}' for skill_name in necessary_skills]\
+                    + ['defense', 'decorations_score', 'nb_decorations_size_1']
+            case "decorations":
+                sort_by = [f'skills_{skill_name}' for skill_name in necessary_skills]\
+                    + ['decorations_score', 'defense', 'nb_decorations_size_1']
         best_set = all_relevant_sets.sort_values(by=sort_by, ascending=False).iloc[0].to_frame().transpose()
+
         best_set[best_set.columns[11:]] = best_set[best_set.columns[11:]].replace(0, np.nan)
         best_set.dropna(inplace=True, axis=1)
 
