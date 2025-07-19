@@ -1,29 +1,23 @@
 import streamlit as st
+from src.model import Model
 
+
+@st.cache_resource
+def load_model():
+    return Model(k=50)
+
+
+model = load_model()
+db_csv = model.prepare_csv()
 
 st.set_page_config(
     page_title="The Guild Oracle",
-    page_icon="👋",
 )
 
-st.write("# Welcome to Streamlit! 👋")
+st.title("The Guild Oracle")
 
-st.sidebar.success("Select a demo above.")
-
-st.markdown(
-    """
-    Streamlit is an open-source app framework built specifically for
-    Machine Learning and Data Science projects.
-    **👈 Select a demo from the sidebar** to see some examples
-    of what Streamlit can do!
-    ### Want to learn more?
-    - Check out [streamlit.io](https://streamlit.io)
-    - Jump into our [documentation](https://docs.streamlit.io)
-    - Ask a question in our [community
-        forums](https://discuss.streamlit.io)
-    ### See more complex demos
-    - Use a neural net to [analyze the Udacity Self-driving Car Image
-        Dataset](https://github.com/streamlit/demo-self-driving)
-    - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-"""
-)
+with st.form("my_form"):
+    text = st.text_area(label="Ask your question about Monster Hunter Wilds to The Guild Oracle.")
+    submitted = st.form_submit_button("Submit")
+    if submitted:
+        st.info(model.rag(db_faiss=db_csv, query=text))
