@@ -6,22 +6,21 @@ if __name__ == "__main__":
         page_title="Home",
     )
 
-    st.title("# Welcome to Streamlit! 👋")
+    st.title("Your Ultimate Companion for Monster Hunter Wilds")
 
     st.markdown(
         """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-            forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-            Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
+        ### Craft the Perfect Build with our Set Maker
+        Build your ideal set in just a few clicks:
+        - Pick the skills you want
+        - prioritize an higher defense or more decorations
+        - Optimize your gear for any monster, quest, or playstyle
+        ### Ask Anything with our AI Assistant
+        Need advice? Help to farm mats? Or a quick reminder of a monster's weaknesses?
+        Our AI assistant, trained on thousands of Monster Hunter resources, is ready to help instantly!
+        ### Ready to Hunt?
+        Whether you're a seasoned hunter or just starting out,
+        our app saves you time and helps you hunt smarter.
+        Build, optimize… and head into the wild!
+        """
     )
