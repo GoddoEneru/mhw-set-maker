@@ -42,4 +42,42 @@ elif clicked:
     armor_sets = set_maker.make_armor_sets(filtered_df_armors, filtered_df_talismans, df_best_armors)
     relevant_sets = set_maker.filter_valid_armor_sets(armor_sets, df_skills)
     best_set = set_maker.get_best_set(relevant_sets, necessary_skills, sort_on)
-    st.write(best_set)
+
+    newline = "\n"
+    cols_skills = [col for col in best_set.columns if "skills" in col]
+    skills = {col_skill.split('_')[1]: best_set[col_skill].item() for col_skill in cols_skills}
+
+    st.header("Generated armor set")
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.subheader("Armor pieces")
+        st.markdown(
+            f"""
+            - Head : **{best_set['head'].item()}**
+            - Chest : **{best_set['chest'].item()}**
+            - Arm : **{best_set['arm'].item()}**
+            - Waist : **{best_set['waist'].item()}**
+            - Leg : **{best_set['leg'].item()}**
+            - Talisman : **{best_set['talisman'].item()}**
+            """
+            )
+
+    with col2:
+        st.subheader("Skills")
+        st.markdown(
+            f"""
+            {newline.join(f"- {key} : **level {int(value)}**" for key, value in skills.items())}
+            """
+        )
+
+    with col3:
+        st.subheader("Stats")
+        st.markdown(
+            f"""
+            - Defense : **{best_set['defense'].item()}**
+            - Number of size 1 decorations : **{best_set['nb_decorations_size_1'].item()}**
+            - Number of size 2 decorations : **{best_set['nb_decorations_size_2'].item()}**
+            - Number of size 3 decorations : **{best_set['nb_decorations_size_3'].item()}**
+            """
+        )
