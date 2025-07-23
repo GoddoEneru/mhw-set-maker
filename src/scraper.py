@@ -4,6 +4,13 @@ import pandas as pd
 
 
 class Scraper:
+    """
+    A web scraping class for extracting Monster Hunter game data from Game8.co pages.
+
+    This class retrieves tables containing information about decorations, armors,
+    skills, and talismans from various pre-defined URLs. The resulting data is returned
+    as pandas DataFrames ready for further processing.
+    """
     def __init__(
             self,
             decoration_url="https://game8.co/games/Monster-Hunter-Wilds/archives/500473",
@@ -29,6 +36,16 @@ class Scraper:
         self.talismans_url = talismans_url
 
     def _get_table_from_url(self, url, text):
+        """
+        Retrieves the first HTML table from a given URL that contains a specific column header.
+
+        Args:
+            url (str): The webpage URL to scrape.
+            text (str): Text content to match in one of the table headers (e.g., 'Slots').
+
+        Returns:
+            bs4.element.Tag: The BeautifulSoup table tag if found, otherwise None.
+        """
         page = requests.get(url)
         soup = BeautifulSoup(page.text, "html.parser")
         tables = soup.find_all('table')
@@ -37,6 +54,15 @@ class Scraper:
                 return table
 
     def decorations_scraping(self):
+        """
+        Scrapes the decorations table from the decoration URL.
+
+        - Extracts columns such as skill and slot size from the table.
+        - Converts the raw HTML data into a pandas DataFrame.
+
+        Returns:
+            pandas.DataFrame: A DataFrame containing decoration data.
+        """
         table = self._get_table_from_url(self.decoration_url, "Slots")
         columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
         data = []
@@ -47,6 +73,18 @@ class Scraper:
         return df_decorations
 
     def armors_scraping(self):
+        """
+        Scrapes armor data from multiple armor-type URLs and retrieves decoration slot info from monster-specific pages.
+
+        - Merges armor pieces of different types into a unified DataFrame.
+        - Collects slot sizes by scraping linked monster-specific armor pages.
+        - Converts the raw HTML data into two pandas DataFrame.
+
+        Returns:
+            tuple:
+                - pandas.DataFrame: Armor data with type labels.
+                - pandas.DataFrame: Decoration slot information per armor piece.
+        """
         # get data from armors by type (head, chest, arm, waist and leg)
         df_armors = pd.DataFrame()
         armors_by_type_urls = [
@@ -97,6 +135,15 @@ class Scraper:
         return df_armors, df_decorations_slots
 
     def skills_info_scraping(self):
+        """
+        Scrapes the skills information table from the skills info URL.
+
+        - Extracts details such as skill names, types, and effect descriptions.
+        - Converts the raw HTML data into a pandas DataFrame.
+
+        Returns:
+            pandas.DataFrame: A DataFrame containing skill names, effects, and related metadata.
+        """
         table = self._get_table_from_url(self.skills_info_url, "Type")
         columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
         data = []
@@ -107,6 +154,15 @@ class Scraper:
         return df_skills_info
 
     def talismans_scraping(self):
+        """
+        Scrapes the talismans table from the talismans URL.
+
+        - Extracts talisman names, skills, and slot information.
+        - Converts the raw HTML data into a pandas DataFrame.
+
+        Returns:
+            pandas.DataFrame: A DataFrame containing talisman information.
+        """
         table = self._get_table_from_url(self.talismans_url, "Talisman")
         columns = [col_name.get_text(strip=True) for col_name in table.find_all("th")]
         data = []
