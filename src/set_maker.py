@@ -6,12 +6,29 @@ from src.armor_set import ArmorSet
 
 
 class SetMaker:
+    """
+    A class responsible for generating optimized armor sets based on user-defined skill preferences.
+
+    This class loads cleaned armor, talisman, and skill data, filters relevant items,
+    computes combinations of armor sets, and returns valid or optimal configurations
+    based on defense or decoration potential.
+    """
     def __init__(self):
         self.df_armors = pd.read_csv("src/data/armors.csv")
         self.df_talismans = pd.read_csv("src/data/talismans.csv")
         self.df_skills = pd.read_csv("src/data/skills.csv")
 
     def add_decorations_score_col(self, df_armors):
+        """
+        Adds a 'Decorations_score' column to the armor DataFrame by summing
+        the sizes of all available decoration slots.
+
+        Args:
+            df_armors (pandas.DataFrame): The armor data.
+
+        Returns:
+            pandas.DataFrame: The modified armor DataFrame with a new 'Decorations_score' column.
+        """
         decoration_cols_names = ['Decoration_slot_1_size', 'Decoration_slot_2_size', 'Decoration_slot_3_size']
         df_armors[decoration_cols_names] = df_armors[decoration_cols_names].fillna(0)
         df_armors['Decorations_score'] = df_armors.apply(
@@ -19,6 +36,22 @@ class SetMaker:
         return df_armors
 
     def filter_relevant_armors_and_talismans(self, skills, df_armors, df_talismans):
+        """
+        Filters armors and talismans to only include those with the desired skills.
+
+        - Filters armors that provide any of the desired skills.
+        - Filters and reduces talismans to one per skill with the highest level.
+
+        Args:
+            skills (list): List of skill names to search for.
+            df_armors (pandas.DataFrame): Armor data.
+            df_talismans (pandas.DataFrame): Talisman data.
+
+        Returns:
+            tuple:
+                - pandas.DataFrame: Filtered armors.
+                - pandas.DataFrame: Filtered talismans.
+        """
         filter = df_armors['Skill_1_name'].isin(skills)\
             | df_armors['Skill_2_name'].isin(skills)\
             | df_armors['Skill_3_name'].isin(skills)
@@ -34,6 +67,17 @@ class SetMaker:
         return filtered_df_armors, filtered_df_talismans
 
     def get_best_armor_for_each_type(self, df_armors, sort_on='defense'):
+        """
+        Retrieves the top-performing armor piece for each type (head, chest, etc.)
+        based on the given sorting criteria.
+
+        Args:
+            df_armors (pandas.DataFrame): DataFrame of available armors.
+            sort_on (str): Criteria to sort by; either 'defense' or 'decorations'.
+
+        Returns:
+            pandas.DataFrame: The best armor piece for each armor type.
+        """
         sorted_df_armors = df_armors.copy()
         match sort_on:
             case "defense":
@@ -48,6 +92,21 @@ class SetMaker:
         return df_best_armors
 
     def make_armor_sets(self, filtered_df_armors, filtered_df_talismans, df_best_armors):
+        """
+        Generates all possible combinations of armor sets by iterating over every
+        valid combination of armor pieces and talismans.
+
+        - Uses deep copies to preserve intermediate state.
+        - Builds full sets (head, chest, arm, waist, leg + talisman).
+
+        Args:
+            filtered_df_armors (pandas.DataFrame): Filtered set of relevant armors.
+            filtered_df_talismans (pandas.DataFrame): Filtered set of relevant talismans.
+            df_best_armors (pandas.DataFrame): Best armor pieces by type to supplement combinations.
+
+        Returns:
+            pandas.DataFrame: All generated armor set combinations.
+        """
         df_usable_armors = pd.concat([filtered_df_armors, df_best_armors])
         all_armor_sets = []
         # Armors head loop
@@ -85,6 +144,19 @@ class SetMaker:
         return all_armor_sets
 
     def filter_valid_armor_sets(self, all_armor_sets, df_skills):
+        """
+        Filters out armor sets that exceed the maximum allowed skill levels.
+
+        - Compares each skill in the armor set against its max level.
+        - Keeps only the valid combinations.
+
+        Args:
+            all_armor_sets (pandas.DataFrame): All generated armor sets.
+            df_skills (pandas.DataFrame): Skill data containing max level for each skill.
+
+        Returns:
+            pandas.DataFrame: Valid armor sets.
+        """
         all_armor_sets.reset_index(inplace=True, drop=True)
         all_armor_sets = all_armor_sets.fillna(0)
 
@@ -94,11 +166,26 @@ class SetMaker:
                        <= df_skills[df_skills['Skill'] == skill_name.split('_')[1]]['skill_max_level'].item())
         all_relevant_sets = all_armor_sets.loc[filter].reset_index(drop=True)
 
-        # add_defense_by_skills_to_armor_sets()
-
         return all_relevant_sets
 
+    # add_defense_by_skills_to_armor_sets(self, all_relevant_sets)
+
     def get_best_set(self, all_relevant_sets, necessary_skills, sort_on='defense'):
+        """
+        Selects the best armor set among all valid ones, based on required skills
+        and a prioritization criterion (defense or decoration score).
+
+        - Sorts by skill levels, defense, decoration score, and slot availability.
+        - Drops unused columns and empty skill entries.
+
+        Args:
+            all_relevant_sets (pandas.DataFrame): Valid armor sets.
+            necessary_skills (list): Skills required in the final armor set.
+            sort_on (str): Primary sorting criterion, 'defense' or 'decorations'.
+
+        Returns:
+            pandas.DataFrame: A single-row DataFrame containing the best armor set.
+        """
         match sort_on:
             case "defense":
                 sort_by = [f'skills_{skill_name}' for skill_name in necessary_skills]\
