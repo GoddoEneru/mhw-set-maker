@@ -2,6 +2,11 @@ import pandas as pd
 
 
 class Cleaner:
+    """
+    A data cleaning class for processing raw data related to decorations,
+    armors, skills, and talismans. This class prepares and saves structured, cleaned datasets
+    for further analysis or machine learning tasks.
+    """
     def __init__(
             self,
             decoration_csv="src/data/decorations.csv",
@@ -15,6 +20,17 @@ class Cleaner:
         self.talismans_csv = talismans_csv
 
     def _get_one_col_per_skill(self, df, skills_col_name, reg_rule):
+        """
+        Splits skill strings into separate columns.
+
+        Args:
+            df (pandas.DataFrame)
+            skills_col_name (str)
+            reg_rule (str)
+
+        Returns:
+            pandas.DataFrame
+        """
         temp = df[skills_col_name].str.extractall(reg_rule).unstack()
         temp.columns = temp.columns.droplevel()
         df = pd.concat([df, temp], axis=1)
@@ -22,6 +38,16 @@ class Cleaner:
         return df
 
     def _get_skill_lvl_from_skill_columns(self, df, n):
+        """
+        Extracts skill level from skill columns.
+
+        Args:
+            df (pandas.DataFrame)
+            n (int)
+
+        Returns:
+            pandas.DataFrame
+        """
         temp = df[f'Skill {n}'].str.extractall(r'(\d)').unstack()
         temp.columns = temp.columns.droplevel()
         df = pd.concat([df, temp], axis=1)
@@ -29,6 +55,15 @@ class Cleaner:
         return df
 
     def _slot_size_char_to_int(self, c):
+        """
+        Converts slot size symbols to integers.
+
+        Args:
+            c (str)
+
+        Returns:
+            int or NoneType
+        """
         match c:
             case "ー":
                 return None
@@ -40,11 +75,26 @@ class Cleaner:
                 return 3
 
     def _correct_error_in_skill_col(self, skill):
+        """
+        Appends default level to malformed skill strings.
+
+        Args:
+            skill (str)
+
+        Returns:
+            str
+        """
         if skill[-1].isnumeric():
             return skill
         return skill + "1"
 
     def decorations_cleaning(self, df_decorations):
+        """
+        Cleans and restructures the decorations dataset.
+
+        Args:
+            df_decorations (pandas.DataFrame)
+        """
         df_decorations = self._get_one_col_per_skill(df_decorations, 'Skill', r'(\D+Lv. \d)')
         for n in range(1, 2):
             temp = df_decorations[f'Skill {n}'].str.split(r'(Lv. \d)').str[0]
@@ -57,6 +107,13 @@ class Cleaner:
         df_decorations.to_csv(self.decoration_csv, index=False)
 
     def armors_cleaning(self, df_armors, df_decorations_slots):
+        """
+        Cleans the armors dataset and merges decorations slots info to it.
+
+        Args:
+            df_armors (pandas.DataFrame)
+            df_decorations_slots (pandas.DataFrame)
+        """
         df_armors.reset_index(drop=True, inplace=True)
 
         df_armors.rename(columns={"": "Defense"}, inplace=True)
@@ -105,6 +162,12 @@ class Cleaner:
         df_armors.to_csv(self.armors_csv, index=False)
 
     def skills_info_cleaning(self, df_skills_info):
+        """
+        Extracts and formats skill level information.
+
+        Args:
+            df_skills_info (pandas.DataFrame)
+        """
         temp = df_skills_info['Effect'].str.extractall(r'(Lv. \d)').unstack()
         temp.columns = temp.columns.droplevel()
         temp['final'] = temp.ffill(axis=1).iloc[:, -1]
@@ -116,6 +179,12 @@ class Cleaner:
         df_skills_info.to_csv(self.skills_info_csv, index=False)
 
     def talismans_cleaning(self, df_talismans):
+        """
+        Cleans skill data for talismans.
+
+        Args:
+            df_talismans (pandas.DataFrame)
+        """
         df_talismans["Skill_name"] = df_talismans['Skill'].str.split(r'(Lv \d)').str[0]
         df_talismans["Skill_lvl"] = df_talismans['Skill'].str.extract(r'(\d)')
         df_talismans.drop(columns=['Skill'], inplace=True)
