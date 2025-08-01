@@ -155,7 +155,7 @@ class SetMaker:
             df_skills (pandas.DataFrame): Skill data containing max level for each skill.
 
         Returns:
-            pandas.DataFrame: Valid armor sets.
+            pandas.DataFrame: All valid armor sets.
         """
         all_armor_sets.reset_index(inplace=True, drop=True)
         all_armor_sets = all_armor_sets.fillna(0)
@@ -168,7 +168,71 @@ class SetMaker:
 
         return all_relevant_sets
 
-    # add_defense_by_skills_to_armor_sets(self, all_relevant_sets)
+    def add_defense_by_skills_to_armor_sets(self, all_relevant_sets):
+        """
+        Adjusts the base defense value of each armor set based on defense-related skills.
+
+        This method modifies the 'defense' column in the DataFrame by applying percentage-based
+        and flat bonuses from active defensive skills such as:
+        - Defense Boost (Lv1-Lv5)
+        - Elemental Resistances (e.g., Fire, Ice, Dragon, Thunder, Water) at Lv3
+
+        The skill impact is defined in a dictionary (`defense_by_skills`) where each key represents
+        a skill at a specific level, and the corresponding value is a list:
+        [percentage_bonus, flat_bonus].
+
+        Args:
+            all_relevant_sets (pandas.DataFrame): All valid armor sets.
+
+        Returns:
+            pandas.DataFrame: The same DataFrame with updated defense values reflecting skill-based bonuses.
+        """
+        defense_by_skills = {
+            'Defense Boost_lv0': [0/100, 0],
+            'Defense Boost_lv1': [0/100, 5],
+            'Defense Boost_lv2': [0/100, 10],
+            'Defense Boost_lv3': [5/100, 10],
+            'Defense Boost_lv4': [5/100, 20],
+            'Defense Boost_lv5': [8/100, 20],
+            'Dragon Resistance_lv0': [0/100, 0],
+            'Dragon Resistance_lv1': [0/100, 0],
+            'Dragon Resistance_lv2': [0/100, 0],
+            'Dragon Resistance_lv3': [0/100, 10],
+            'Fire Resistance_lv0': [0/100, 0],
+            'Fire Resistance_lv1': [0/100, 0],
+            'Fire Resistance_lv2': [0/100, 0],
+            'Fire Resistance_lv3': [0/100, 10],
+            'Ice Resistance_lv0': [0/100, 0],
+            'Ice Resistance_lv1': [0/100, 0],
+            'Ice Resistance_lv2': [0/100, 0],
+            'Ice Resistance_lv3': [0/100, 10],
+            'Thunder Resistance_lv0': [0/100, 0],
+            'Thunder Resistance_lv1': [0/100, 0],
+            'Thunder Resistance_lv2': [0/100, 0],
+            'Thunder Resistance_lv3': [0/100, 10],
+            'Water Resistance_lv0': [0/100, 0],
+            'Water Resistance_lv1': [0/100, 0],
+            'Water Resistance_lv2': [0/100, 0],
+            'Water Resistance_lv3': [0/100, 10]
+        }
+
+        cols_skills = [col_skill for col_skill in all_relevant_sets.columns if 'skills' in col_skill]
+        defense_skill_names = [defense_skill.split('_')[0] for defense_skill in defense_by_skills.keys()]
+
+        cols_defense_skills = [col_skill for col_skill in cols_skills if col_skill.split('_')[1] in defense_skill_names]
+        cols_defense_skills.sort()
+
+        for col_skill in cols_defense_skills:
+            all_relevant_sets['defense'] = all_relevant_sets.apply(
+                lambda x: x['defense']
+                + (defense_by_skills[f'{col_skill.split('_')[1]}_lv{int(x[col_skill])}'][0] * x['defense'])
+                + defense_by_skills[f'{col_skill.split('_')[1]}_lv{int(x[col_skill])}'][1],
+                axis=1
+                )
+
+        all_relevant_sets['defense'] = all_relevant_sets['defense'].round().astype(int)
+
+        return all_relevant_sets
 
     def get_best_set(self, all_relevant_sets, necessary_skills, sort_on='defense'):
         """
