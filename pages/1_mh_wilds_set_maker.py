@@ -41,6 +41,7 @@ elif clicked:
     df_best_armors = set_maker.get_best_armor_for_each_type(df_armors, sort_on)
     armor_sets = set_maker.make_armor_sets(filtered_df_armors, filtered_df_talismans, df_best_armors)
     relevant_sets = set_maker.filter_valid_armor_sets(armor_sets, df_skills)
+    relevant_sets = set_maker.add_defense_by_skills_to_armor_sets(relevant_sets)
     best_set = set_maker.get_best_set(relevant_sets, necessary_skills, sort_on)
 
     newline = "\n"
