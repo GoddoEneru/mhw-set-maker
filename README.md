@@ -55,9 +55,9 @@ source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
-4. Create a ".env" file and put you OpenAI api key in it
+4. Create a ".streamlit" folder in the working directory with a "secrets.toml" file and put you OpenAI api key in it
 ```
-API_KEY = 'your-openai-api-key'
+OPENAI_API_KEY = "your-openai-api-key"
 ```
 
 5. Run the app and have fun with it !
