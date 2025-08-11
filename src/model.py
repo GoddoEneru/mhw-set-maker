@@ -8,6 +8,7 @@ from langchain.vectorstores.faiss import FAISS
 class Model:
     def __init__(
             self,
+            api_key,
             chunk_size=3000,
             chunk_overlap=500,
             embedding_model="text-embedding-3-large",
@@ -15,7 +16,7 @@ class Model:
             llm_model="gpt-4o-mini",
             temperature=0
             ):
-        self.api_key = os.getenv('API_KEY')
+        self.api_key = api_key
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.embedding_model = embedding_model

@@ -4,7 +4,7 @@ from src.model import Model
 
 @st.cache_resource
 def load_model():
-    return Model(k=50)
+    return Model(api_key=st.secrets["OPENAI_API_KEY"], k=50)
 
 
 model = load_model()
