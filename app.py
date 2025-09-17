@@ -17,7 +17,7 @@ if __name__ == "__main__":
         - Optimize your gear for any monster, quest, or playstyle
         ### Ask Anything with our AI Assistant
         Need advice? Help to farm mats? Or a quick reminder of a monster's weaknesses?
-        Our AI assistant, trained on thousands of Monster Hunter resources, is ready to help instantly!
+        Our AI assistant, trained on game data and guides, is ready to help instantly!
         ### Ready to Hunt?
         Whether you're a seasoned hunter or just starting out,
         our app saves you time and helps you hunt smarter.

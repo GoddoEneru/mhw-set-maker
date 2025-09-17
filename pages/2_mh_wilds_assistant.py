@@ -8,7 +8,8 @@ def load_model():
 
 
 model = load_model()
-db_csv = model.prepare_csv()
+chunks = model.prepare_csv()
+db_faiss = model.create_database(chunks)
 
 st.set_page_config(
     page_title="The Guild Oracle",
@@ -20,4 +21,4 @@ with st.form("my_form"):
     text = st.text_area(label="Ask your question about Monster Hunter Wilds to The Guild Oracle.")
     submitted = st.form_submit_button("Submit")
     if submitted:
-        st.info(model.rag(db_faiss=db_csv, query=text))
+        st.info(model.rag(db_faiss=db_faiss, query=text))
