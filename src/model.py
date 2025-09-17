@@ -12,7 +12,7 @@ class Model:
             embedding_model="text-embedding-3-large",
             k=20,
             llm_model="gpt-4.1-mini",
-            temperature=0.5
+            temperature=0.2
             ):
         self.api_key = api_key
         self.embedding_model = embedding_model
@@ -57,9 +57,9 @@ class Model:
         output_retrieval_merged = "\n".join([doc.page_content for doc in output_retrieval])
 
         prompt = f"""
-        based on what you can find on "Monster Hunter Wilds" and this context: {output_retrieval_merged}
-        answer the following question: {query}
-        if you don't have information on the answer, say you don't know
+        based only on this context and not what you know: {output_retrieval_merged}
+        answer the following question, talking like a human sage: {query}
+        if you don't have information on the answer, say that you don't have the answer in all your books.
         """
 
         model = ChatOpenAI(
