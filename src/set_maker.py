@@ -18,6 +18,20 @@ class SetMaker:
         self.df_talismans = pd.read_csv("src/data/talismans.csv")
         self.df_skills = pd.read_csv("src/data/skills.csv")
 
+    def _armor_set_recursion(self, i, armor_set, all_armor_sets, df_usable_armors, armor_cat, filtered_df_talismans):
+        if i < 5:
+            for id, armor in df_usable_armors[df_usable_armors['Armor_type'] == armor_cat[i]].iterrows():
+                armor_set_part = deepcopy(armor_set)
+                armor_set_part.update_armors(armor_type=armor_cat[i], df_armors_filtered_by_type=armor)
+                all_armor_sets = self._armor_set_recursion(
+                    i+1, armor_set_part, all_armor_sets, df_usable_armors, armor_cat, filtered_df_talismans)
+        else:
+            for id, talisman in filtered_df_talismans.iterrows():
+                armor_set_talisman = deepcopy(armor_set)
+                armor_set_talisman.update_talisman(talisman)
+                all_armor_sets.append(armor_set_talisman)
+        return all_armor_sets
+
     def add_decorations_score_col(self, df_armors):
         """
         Adds a 'Decorations_score' column to the armor DataFrame by summing
@@ -108,33 +122,13 @@ class SetMaker:
             pandas.DataFrame: All generated armor set combinations.
         """
         df_usable_armors = pd.concat([filtered_df_armors, df_best_armors])
+        armor_cat = ['head', 'chest', 'arm', 'waist', 'leg']
+
         all_armor_sets = []
-        # Armors head loop
-        for id, df_armor_head in df_usable_armors[df_usable_armors['Armor_type'] == 'head'].iterrows():
-            armor_set_head = ArmorSet()
-            armor_set_head.update_armors(armor_type='head', df_armors_filtered_by_type=df_armor_head)
-            # Armors chest loop
-            for id, df_armor_chest in df_usable_armors[df_usable_armors['Armor_type'] == 'chest'].iterrows():
-                armor_set_chest = deepcopy(armor_set_head)
-                armor_set_chest.update_armors(armor_type='chest', df_armors_filtered_by_type=df_armor_chest)
-                # Armors arm loop
-                for id, df_armor_arm in df_usable_armors[df_usable_armors['Armor_type'] == 'arm'].iterrows():
-                    armor_set_arm = deepcopy(armor_set_chest)
-                    armor_set_arm.update_armors(armor_type='arm', df_armors_filtered_by_type=df_armor_arm)
-                    # Armors waist loop
-                    for id, df_armor_waist in df_usable_armors[df_usable_armors['Armor_type'] == 'waist'].iterrows():
-                        armor_set_waist = deepcopy(armor_set_arm)
-                        armor_set_waist.update_armors(armor_type='waist', df_armors_filtered_by_type=df_armor_waist)
-                        # Armors leg loop
-                        for id, df_armor_leg in df_usable_armors[df_usable_armors['Armor_type'] == 'leg'].iterrows():
-                            armor_set_leg = deepcopy(armor_set_waist)
-                            armor_set_leg.update_armors(armor_type='leg', df_armors_filtered_by_type=df_armor_leg)
-                            # Talismans loop
-                            for id, df_talisman in filtered_df_talismans.iterrows():
-                                armor_set_talisman = deepcopy(armor_set_leg)
-                                armor_set_talisman.update_talisman(df_talisman)
-                                # Append finished set
-                                all_armor_sets.append(armor_set_talisman)
+        armor_set = ArmorSet()
+
+        all_armor_sets = self._armor_set_recursion(
+            0, armor_set, all_armor_sets, df_usable_armors, armor_cat, filtered_df_talismans)
 
         if len(all_armor_sets) > 1:
             all_armor_sets = pd.concat(
