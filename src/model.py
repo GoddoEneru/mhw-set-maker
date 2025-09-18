@@ -1,6 +1,6 @@
 import os
-from langchain_community.document_loaders import DirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+import pandas as pd
+from langchain_core.documents import Document
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.vectorstores.faiss import FAISS
 
@@ -9,33 +9,39 @@ class Model:
     def __init__(
             self,
             api_key,
-            chunk_size=3000,
-            chunk_overlap=500,
             embedding_model="text-embedding-3-large",
-            k=5,
-            llm_model="gpt-4o-mini",
-            temperature=0
+            k=20,
+            llm_model="gpt-4.1-mini",
+            temperature=0.2
             ):
         self.api_key = api_key
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
         self.embedding_model = embedding_model
         self.k = k
         self.llm_model = llm_model
         self.temperature = temperature
 
     def prepare_csv(self):
-        loader = DirectoryLoader(path=os.getcwd(), glob="src/data/*.csv", use_multithreading=True)
-        data = loader.load()
+        chunks = []
 
-        # Split data into chunks
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap
-        )
+        for file in os.listdir('src/data'):
+            df_temp = pd.read_csv(f'src/data/{file}')
 
-        chunks = text_splitter.split_documents(data)
+            for col in df_temp.columns.tolist():
+                df_temp[col] = df_temp[col].apply(lambda x: f"{col}: {x}")
 
+            for index, row in df_temp.iterrows():
+                content = ", ".join(row.tolist())
+                metadata = {"source": file}
+
+                chunk = Document(
+                    page_content=content,
+                    metadata=metadata,
+                )
+                chunks.append(chunk)
+
+        return chunks
+
+    def create_database(self, chunks):
         embeddings = OpenAIEmbeddings(
             openai_api_key=self.api_key,
             model=self.embedding_model
@@ -52,8 +58,8 @@ class Model:
 
         prompt = f"""
         based only on this context and not what you know: {output_retrieval_merged}
-        answer the following question : {query}
-        if you don't have information on the answer, say you don't know
+        answer the following question, talking like a human sage: {query}
+        if you don't have information on the answer, say that you don't have the answer in all your books.
         """
 
         model = ChatOpenAI(
