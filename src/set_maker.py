@@ -19,6 +19,26 @@ class SetMaker:
         self.df_skills = pd.read_csv("src/data/skills.csv")
 
     def _armor_set_recursion(self, i, armor_set, all_armor_sets, df_usable_armors, armor_cat, filtered_df_talismans):
+        """
+        Recursively builds all possible armor sets by combining armor pieces from each category
+        and talismans.
+        This helper function explores armor combinations in a depth-first manner:
+        - For indices 0-4, it selects an armor piece from the corresponding category
+          (head, chest, arm, waist, leg), updates the current `ArmorSet`, and recurses deeper.
+        - Once all armor categories are filled (i == 5), it iterates through the filtered talismans,
+          attaches one to the set, and appends the completed set to `all_armor_sets`.
+
+        Args:
+            i (int): Current index of the armor category being processed.
+            armor_set (ArmorSet): The partially constructed armor set to be expanded.
+            all_armor_sets (list): Accumulator list of fully constructed armor sets.
+            df_usable_armors (pandas.DataFrame): DataFrame containing all candidate armors.
+            armor_cat (list): Ordered list of armor categories (e.g., ["head", "chest", "arm", "waist", "leg"]).
+            filtered_df_talismans (pandas.DataFrame): DataFrame of talismans filtered by relevant skills.
+
+        Returns:
+            list: Updated list containing all constructed armor sets.
+        """
         if i < 5:
             for id, armor in df_usable_armors[df_usable_armors['Armor_type'] == armor_cat[i]].iterrows():
                 armor_set_part = deepcopy(armor_set)
@@ -107,11 +127,12 @@ class SetMaker:
 
     def make_armor_sets(self, filtered_df_armors, filtered_df_talismans, df_best_armors):
         """
-        Generates all possible combinations of armor sets by iterating over every
-        valid combination of armor pieces and talismans.
+        Generates all possible armor set combinations by recursively combining armor pieces
+        (head, chest, arm, waist, leg) with talismans.
 
-        - Uses deep copies to preserve intermediate state.
-        - Builds full sets (head, chest, arm, waist, leg + talisman).
+        - Concatenates the filtered relevant armors with the best armor pieces per type.
+        - Uses `_armor_set_recursion` to explore every valid combination in a depth-first manner.
+        - Each completed set is normalized into a flattened DataFrame row for analysis.
 
         Args:
             filtered_df_armors (pandas.DataFrame): Filtered set of relevant armors.
