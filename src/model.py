@@ -6,6 +6,10 @@ from langchain.vectorstores.faiss import FAISS
 
 
 class Model:
+    """
+    A Retrieval-Augmented Generation (RAG) pipeline for querying structured CSV data
+    using vector embeddings and a language model.
+    """
     def __init__(
             self,
             api_key,
@@ -21,6 +25,16 @@ class Model:
         self.temperature = temperature
 
     def prepare_csv(self):
+        """
+        Loads and preprocesses all CSV files from the `src/data` directory.
+
+        Each cell is prefixed with its column name for added context.
+        Rows are converted into LangChain `Document` objects with metadata
+        identifying their source file.
+
+        Returns:
+            list: A list of document chunks representing all rows across the CSV files in `src/data`.
+        """
         chunks = []
 
         for file in os.listdir('src/data'):
@@ -42,6 +56,15 @@ class Model:
         return chunks
 
     def create_database(self, chunks):
+        """
+        Creates a FAISS vector database from document chunks using OpenAI embeddings.
+
+        Args:
+            chunks (list): List of LangChain `Document` objects created from CSV files.
+
+        Returns:
+            FAISS: A FAISS vector store containing the embedded document representations.
+        """
         embeddings = OpenAIEmbeddings(
             openai_api_key=self.api_key,
             model=self.embedding_model
@@ -52,6 +75,23 @@ class Model:
         return db_faiss
 
     def rag(self, db_faiss, query):
+        """
+        Performs Retrieval-Augmented Generation (RAG) to answer a query.
+
+        Steps:
+        1. Retrieves the top-k most relevant documents from the FAISS index.
+        2. Merges their content into a context string.
+        3. Constructs a prompt instructing the LLM to answer the query
+           only from the retrieved context.
+        4. Calls the LLM and returns the generated response.
+
+        Args:
+            db_faiss (FAISS): FAISS vector store containing embedded documents.
+            query (str): Natural language query to answer.
+
+        Returns:
+            str: The model's generated response based on retrieved context.
+        """
         output_retrieval = db_faiss.similarity_search(query, k=self.k)
 
         output_retrieval_merged = "\n".join([doc.page_content for doc in output_retrieval])
