@@ -6,10 +6,10 @@ from src.set_maker import SetMaker
 
 
 if 'try_to_update' not in st.session_state:
-    st.session_state['try_to_update'] = False
+    st.session_state['try_to_update'] = True
 
 if 'updated' not in st.session_state:
-    st.session_state['updated'] = False
+    st.session_state['updated'] = True
 
 df_armors = pd.read_csv("src/data/armors.csv")
 df_talismans = pd.read_csv("src/data/talismans.csv")
@@ -46,7 +46,7 @@ if not st.session_state['try_to_update']:
         st.exception(e)
 
 if st.session_state['updated']:
-    st.success("Data updated! Given armor set will be generated on latest data.")
+    st.success("Data up to date! Given armor set will be generated on latest data.")
 else:
     st.warning("Can't update data. Given armor set will be generated on older data.")
 
