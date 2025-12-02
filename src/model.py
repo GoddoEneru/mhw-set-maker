@@ -97,9 +97,10 @@ class Model:
         output_retrieval_merged = "\n".join([doc.page_content for doc in output_retrieval])
 
         prompt = f"""
-        based only on this context and not what you know: {output_retrieval_merged}
+        based on this context and your own knowledge to complete: {output_retrieval_merged}
         answer the following question, talking like a human sage: {query}
         if you don't have information on the answer, say that you don't have the answer in all your books.
+        Answer questions only about Monster Hunter Wilds.
         """
 
         model = ChatOpenAI(
