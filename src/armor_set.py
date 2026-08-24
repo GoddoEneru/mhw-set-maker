@@ -86,3 +86,65 @@ class ArmorSet:
             self.skills[df_talismans['Skill_name']] = df_talismans['Skill_lvl']
         else:
             self.skills[df_talismans['Skill_name']] += df_talismans['Skill_lvl']
+
+    def revert_armors(self, armor_type, df_armors_filtered_by_type):
+        """
+        Reverses a prior `update_armors` call for the same armor piece, restoring the set
+        to its state before that piece was equipped. Used to backtrack during search
+        instead of copying the whole set at every step.
+
+        Args:
+            armor_type (str): The type of armor piece being unequipped ('head', 'chest', 'arm', 'waist' or 'leg').
+            df_armors_filtered_by_type (pandas.Series): The same data passed to the matching `update_armors` call.
+        """
+        match armor_type:
+            case 'head':
+                self.head = ''
+            case 'chest':
+                self.chest = ''
+            case 'arm':
+                self.arm = ''
+            case 'waist':
+                self.waist = ''
+            case 'leg':
+                self.leg = ''
+
+        self.defense -= df_armors_filtered_by_type['Defense']
+
+        skills_cols_names = ['Skill_1', 'Skill_2', 'Skill_3']
+        for col in skills_cols_names:
+            if df_armors_filtered_by_type[f'{col}_name'] is not np.nan:
+                skill_name = df_armors_filtered_by_type[f'{col}_name']
+                remaining = self.skills[skill_name] - df_armors_filtered_by_type[f'{col}_lvl']
+                if remaining:
+                    self.skills[skill_name] = remaining
+                else:
+                    del self.skills[skill_name]
+
+        decoration_cols_names = ['Decoration_slot_1_size', 'Decoration_slot_2_size', 'Decoration_slot_3_size']
+        for col in decoration_cols_names:
+            match df_armors_filtered_by_type[col]:
+                case 1:
+                    self.nb_decorations_size_1 -= 1
+                case 2:
+                    self.nb_decorations_size_2 -= 1
+                case 3:
+                    self.nb_decorations_size_3 -= 1
+
+        self.decorations_score -= df_armors_filtered_by_type['Decorations_score']
+
+    def revert_talisman(self, df_talismans):
+        """
+        Reverses a prior `update_talisman` call, restoring the set to its state
+        before that talisman was equipped. Used to backtrack during search.
+
+        Args:
+            df_talismans (pandas.Series): The same data passed to the matching `update_talisman` call.
+        """
+        self.talisman = ''
+        skill_name = df_talismans['Skill_name']
+        remaining = self.skills[skill_name] - df_talismans['Skill_lvl']
+        if remaining:
+            self.skills[skill_name] = remaining
+        else:
+            del self.skills[skill_name]

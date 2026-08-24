@@ -9,7 +9,7 @@ if 'try_to_update' not in st.session_state:
     st.session_state['try_to_update'] = True
 
 if 'updated' not in st.session_state:
-    st.session_state['updated'] = True
+    st.session_state['updated'] = False
 
 df_armors = pd.read_csv("src/data/armors.csv")
 df_talismans = pd.read_csv("src/data/talismans.csv")
@@ -75,10 +75,12 @@ elif clicked:
     filtered_df_armors, filtered_df_talismans = set_maker.filter_relevant_armors_and_talismans(
         necessary_skills, df_armors, df_talismans)
     df_best_armors = set_maker.get_best_armor_for_each_type(df_armors, sort_on)
-    armor_sets = set_maker.make_armor_sets(filtered_df_armors, filtered_df_talismans, df_best_armors)
-    relevant_sets = set_maker.filter_valid_armor_sets(armor_sets, df_skills)
-    relevant_sets = set_maker.add_defense_by_skills_to_armor_sets(relevant_sets)
-    best_set = set_maker.get_best_set(relevant_sets, necessary_skills, sort_on)
+    best_set = set_maker.find_best_armor_set(
+        filtered_df_armors, filtered_df_talismans, df_best_armors, df_skills, necessary_skills, sort_on)
+
+    if best_set is None:
+        st.write("No valid armor set found for the selected skills.")
+        st.stop()
 
     newline = "\n"
     cols_skills = [col for col in best_set.columns if "skills" in col]
